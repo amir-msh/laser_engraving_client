@@ -15,7 +15,9 @@ dependencies:
   rive: ^0.9.1
   flutter_bluetooth_serial: ^0.4.0
   permission_handler: ^10.0.0
-  # image_picker: ^0.8.5+3
+  image_picker: ^0.8.5+3
+  flutter_riverpod: ^1.0.4
+  dough: ^1.0.3
 
 
 dev_dependencies:

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
@@ -31,6 +32,10 @@ Future<img.Image> convertFileToEditableImage(io.File file) async {
     return convertToEditableImage(await convertFileToUiImage(file));
   }
   return img.decodeImage(file.readAsBytesSync())!;
+}
+
+Future<Uint8List> convertToViewableBytes(img.Image image) async {
+  return Uint8List.fromList(img.encodeBmp(image));
 }
 
 /// [luminanceThreshold] should be a value between 0.0 and 1.0

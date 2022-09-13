@@ -1,7 +1,9 @@
+import 'package:dough/dough.dart';
 import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:laser_engraving_client/components/option_card.dart';
-import 'package:laser_engraving_client/pages/image_conversion_test.dart';
+import 'package:laser_engraving_client/pages/image_engraving.dart';
+import 'package:laser_engraving_client/pages/painting_engraving.dart';
 import 'package:rive/rive.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,6 +14,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _imagePicker = ImagePicker();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,11 +36,17 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           const Expanded(
-            child: Center(
-              child: RiveAnimation.asset(
-                'assets/rive/laser.riv',
-                artboard: 'engraving',
-                fit: BoxFit.contain,
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Center(
+                child: PressableDough(
+                  child: RiveAnimation.asset(
+                    'assets/rive/laser.riv',
+                    artboard: 'logo',
+                    animations: ['loading'],
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
           ),
@@ -52,36 +62,22 @@ class _HomePageState extends State<HomePage> {
                   onTap: () async {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const ImageConversionTestPage(),
+                        builder: (context) => const ImageEngravingPage(),
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 20),
                 OptionCard(
-                  icon: const Icon(Icons.camera),
-                  title: 'Camera',
-                  onTap: () async {
-                    // final image = await ImagePicker()
-                    //     .pickImage(
-                    //       source: ImageSource.camera,
-                    //       maxHeight: 1000,
-                    //       maxWidth: 1000,
-                    //       preferredCameraDevice: CameraDevice.rear,
-                    //     )
-                    //     .onError((error, stackTrace) => null);
-
-                    // if (image != null) {
-                    //   print('object');
-                    // }
-                  },
-                  // onTap
-                ),
-                const SizedBox(height: 20),
-                OptionCard(
                   icon: const Icon(Icons.draw_outlined),
                   title: 'Painting',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PaintingEngravingPage(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 20),
                 OptionCard(
