@@ -10,12 +10,26 @@ Future<img.Image> convertToEditableImage(ui.Image image) async {
   return img.Image.fromBytes(
     image.width,
     image.height,
-    (await image.toByteData())!.buffer.asUint8List(),
+    await image.toByteData().then(
+          (value) => value!.buffer.asUint8List(),
+        ),
     channels: img.Channels.rgb,
   );
 }
 
-Future<img.Image> fileToEditableImage(io.File file) async {
+Future<ui.Image> convertFileToUiImage(io.File file) async {
+  final completer = Completer<ui.Image>();
+  ui.decodeImageFromList(
+    file.readAsBytesSync(),
+    (result) => completer.complete(result),
+  );
+  return completer.future;
+}
+
+Future<img.Image> convertFileToEditableImage(io.File file) async {
+  if (file.uri.pathSegments.last.endsWith('.heic')) {
+    return convertToEditableImage(await convertFileToUiImage(file));
+  }
   return img.decodeImage(file.readAsBytesSync())!;
 }
 

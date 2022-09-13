@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:laser_engraving_client/pages/home.dart';
+import 'package:laser_engraving_client/pages/splash_screen.dart';
 import 'package:laser_engraving_client/utils/theme.dart';
+
+final navKey = GlobalKey<NavigatorState>();
 
 void main() {
   runApp(const App());
@@ -17,6 +21,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   void initState() {
+    // timeDilation = 2;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.initState();
   }
@@ -24,21 +29,34 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navKey,
       theme: ThemeData(
+        cardColor: Color.alphaBlend(
+          Colors.amber.withOpacity(0.5),
+          accentColor,
+        ),
+        shadowColor: secondaryColor.withOpacity(0.75),
         // primaryColor: const Color(0xff112537),
         // colorSchemeSeed: const Color(0xffF37410),
+        backgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(
           brightness: Brightness.light,
           background: Colors.white,
-          
           seedColor: primaryColor,
           error: Colors.red,
           primary: primaryColor,
-          secondary: accentColor,
+          secondary: secondaryColor,
           outline: secondaryColor,
         ),
+        textTheme: TextTheme(
+          bodyText1: TextStyle(
+            fontSize: 18,
+            color: secondaryColor,
+          ),
+        ),
         iconTheme: const IconThemeData(
-          color: secondaryColor,
+          color: Colors.white,
+          size: 30,
         ),
         primaryIconTheme: const IconThemeData(
           color: secondaryColor,
@@ -60,7 +78,7 @@ class _AppState extends State<App> {
         //   onSurface: onSurface,
         // ),
       ),
-      home: const HomePage(),
+      home: SplashScreenPage(), // const HomePage(),
     );
   }
 }
