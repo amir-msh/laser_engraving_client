@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'dart:ui' as ui;
 import 'dart:io' as io;
@@ -70,13 +71,16 @@ Future<img.Image> convertToLaplacianMasked(img.Image image) async {
   return image;
 }
 
-Future<img.Image> convertToRidgeDetected(img.Image image) async {
+Future<img.Image> convertToRidgeDetected(
+  img.Image image, [
+  double luminanceThreshold = 0.1,
+]) async {
   img.grayscale(image);
   img.contrast(image, 110);
   img.gaussianBlur(image, 1);
   img.convolution(image, ridgeDetection3Kernel);
 
-  await maskUsingLuminance(image, 0.1);
+  await maskUsingLuminance(image, luminanceThreshold);
 
   return image;
 }
@@ -103,7 +107,7 @@ Future<img.Image> fitImageToSize(
 
 Future<img.Image> reshapeToSquare(
   img.Image image, {
-  int backgroundColor = 0xFFFFFFFF,
+  final int backgroundColor = 0xFFFFFFFF,
 }) async {
   final longestSize = max(image.width, image.height);
   final background = img.Image.rgb(
@@ -120,38 +124,36 @@ Future<img.Image> reshapeToSquare(
 
 Future<img.Image> convertToEdgeDetected(
   img.Image image, [
-  final bool invert = false,
+  final double luminanceThreshold = 0.07,
 ]) async {
-  image = await fitImageToSize(image, const Size.square(1000));
+  // image = await fitImageToSize(image, const Size.square(1000));
 
   img.grayscale(image);
   img.vignette(image, start: 0.5, end: 0.9);
   img.contrast(image, 120);
   img.gaussianBlur(image, 1);
   img.sobel(image, amount: 1);
-  await maskUsingLuminance(image, 0.07);
-  image = img.copyCrop(image, 1, 1, image.width - 2, image.height - 2);
+  await maskUsingLuminance(image, luminanceThreshold);
+  // image = img.copyCrop(image, 1, 1, image.width - 2, image.height - 2);
 
-  if (invert) {
-    img.invert(image);
-    image = await reshapeToSquare(
-      image,
-      backgroundColor: 0xFFFFFFFF,
-    );
-  } else {
-    image = await reshapeToSquare(
-      image,
-      backgroundColor: 0xFF000000,
-    );
-  }
-  image = img.copyResize(image, width: 300, height: 300);
+  // if (invert) {
+  //   img.invert(image);
+  //   image = await reshapeToSquare(
+  //     image,
+  //     backgroundColor: 0xFFFFFFFF,
+  //   );
+  // } else {
+  //   image = await reshapeToSquare(
+  //     image,
+  //     backgroundColor: 0xFF000000,
+  //   );
+  // }
+  // image = img.copyResize(image, width: 300, height: 300);
   return image;
 }
 
 Future<img.Image> convertToCustomEdgeDetected(img.Image image) async {
   const filter = [0, -1, 0, -1, 4, -1, 0, -1, 0];
-
-  image = img.copyResizeCropSquare(image, 500);
 
   img.contrast(image, 400);
   img.grayscale(image);
@@ -194,5 +196,44 @@ Future<img.Image> convertToMappedGrayscale(img.Image image) async {
       );
     }
   }
+  return image;
+}
+
+// Engraving functions :
+
+Future<img.Image> applyRidgeEngravingFilter(
+  img.Image image, {
+  final double power = 0.1,
+}) async {
+  return convertToRidgeDetected(
+    image,
+    power,
+  );
+}
+
+Future<img.Image> applyEdgeEngravingFilter(
+  img.Image image, {
+  final double power = 0.07,
+}) async {
+  return convertToEdgeDetected(
+    image,
+    power,
+  );
+}
+
+Future<img.Image> reshapeToSizedSquare(
+  img.Image image,
+  int imageWidth, {
+  int backgroundColor = 0xffffffff,
+}) async {
+  image = await reshapeToSquare(
+    image,
+    backgroundColor: backgroundColor,
+  );
+  image = img.copyResize(
+    image,
+    width: imageWidth,
+    height: imageWidth,
+  );
   return image;
 }

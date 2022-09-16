@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io' as io;
-import 'dart:math' as math;
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:image/image.dart' as img;
 import 'package:file_picker/file_picker.dart';
@@ -29,8 +27,8 @@ class _ImageConversionTestPageState extends State<ImageConversionTestPage> {
   String imageText = '';
   io.File? picFile;
   Uint8List? editedImageBytes;
-
   BluetoothConnection? _btConnection;
+  Stream<Uint8List>? _btInputBroadcastStream;
 
   Widget imageFrameBuilder(
     BuildContext context,
@@ -93,6 +91,9 @@ class _ImageConversionTestPageState extends State<ImageConversionTestPage> {
                   _btConnection = await BluetoothConnection.toAddress(
                     device.address,
                   );
+                  await Future.delayed(const Duration(milliseconds: 500));
+                  _btInputBroadcastStream =
+                      _btConnection!.input?.asBroadcastStream();
                   log('Bluetooth connected to ${device.name}: ${device.address}');
                   setState(() {});
                   break;
@@ -108,10 +109,12 @@ class _ImageConversionTestPageState extends State<ImageConversionTestPage> {
   }
 
   Future<bool> waitForString(
-    BluetoothConnection cn, {
+    Stream<Uint8List> cnStream, {
     required String waitFor,
     Duration? timeout = const Duration(seconds: 10),
   }) async {
+    assert(cnStream.isBroadcast, "Please pass a broadcast stream");
+
     String sumStr = '';
     const terminatorChar = '\n';
     final buffer = StringBuffer();
@@ -124,7 +127,7 @@ class _ImageConversionTestPageState extends State<ImageConversionTestPage> {
       );
     }
 
-    final subs = cn.input?.asBroadcastStream().listen(
+    final subs = cnStream.listen(
       (data) {
         final str = utf8.decode(data);
         final endIndex = str.indexOf(terminatorChar);
@@ -148,7 +151,7 @@ class _ImageConversionTestPageState extends State<ImageConversionTestPage> {
       onError: (e, s) => completer.complete(false),
       cancelOnError: false,
     );
-    if (subs == null) return false;
+    // if (subs == null) return false;
 
     return completer.future.then((res) async {
       log(sumStr, name: 'sumStr : ');
@@ -305,7 +308,7 @@ class _ImageConversionTestPageState extends State<ImageConversionTestPage> {
                 log(bleBytes!.length.toString());
                 for (int pktNum = 0; pktNum < packetsNumber; pktNum++) {
                   final done = await waitForString(
-                    _btConnection!,
+                    _btInputBroadcastStream!,
                     waitFor: '#done\r',
                     timeout: Duration(milliseconds: btPacketSize * 8 * 500),
                   );

@@ -1,6 +1,5 @@
 import 'package:dough/dough.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:laser_engraving_client/components/option_card.dart';
 import 'package:laser_engraving_client/pages/image_engraving.dart';
 import 'package:laser_engraving_client/pages/painting_engraving.dart';
@@ -14,15 +13,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _imagePicker = ImagePicker();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Padding(
-          padding: const EdgeInsets.only(right: 8),
+          padding: const EdgeInsets.only(right: 12.5),
           child: AppBar(
             title: const Text('Laser Client'),
             shape: const RoundedRectangleBorder(
@@ -58,7 +55,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 OptionCard(
                   icon: const Icon(Icons.image_outlined),
-                  title: 'Gallery',
+                  title: 'Image',
                   onTap: () async {
                     Navigator.of(context).push(
                       MaterialPageRoute(

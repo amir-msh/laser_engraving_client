@@ -1,8 +1,6 @@
 import 'package:file_picker/file_picker.dart';
-import 'dart:io' as io;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:laser_engraving_client/image_processing/functions.dart';
 import 'package:laser_engraving_client/main.dart';
 
 class ImageSelectionDialog extends StatelessWidget {

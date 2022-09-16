@@ -1,21 +1,67 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart' as img;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laser_engraving_client/components/image_selection_dialog.dart';
+import 'package:laser_engraving_client/image_processing/functions.dart';
+import 'package:laser_engraving_client/main.dart';
+import 'package:laser_engraving_client/pages/engraving.dart';
+import 'package:laser_engraving_client/riverpod/editable_image/editable_image_notifier.dart';
 
-class ImageEngravingPage extends StatefulWidget {
+class ImageEngravingPage extends ConsumerStatefulWidget {
   const ImageEngravingPage({Key? key}) : super(key: key);
 
   @override
-  State<ImageEngravingPage> createState() => _ImageEngravingPageState();
+  ImageEngravingPageState createState() => ImageEngravingPageState();
 }
 
-class _ImageEngravingPageState extends State<ImageEngravingPage> {
-  final _imagePreviewNotifier = ValueNotifier<Uint8List?>(null);
+class ImageEngravingPageState extends ConsumerState<ImageEngravingPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Widget _imagePreviewBuilder(
+    BuildContext context,
+    AsyncSnapshot<Uint8List> snapshot,
+  ) {
+    if (snapshot.hasData &&
+        snapshot.data != null &&
+        snapshot.connectionState != ConnectionState.waiting) {
+      return Padding(
+        padding: const EdgeInsets.all(10),
+        child: Image.memory(
+          snapshot.data!,
+          key: UniqueKey(),
+          fit: BoxFit.contain,
+          width: double.infinity,
+        ),
+      );
+    } else if (snapshot.hasError) {
+      return Center(
+        child: Text(
+          snapshot.error!.toString(),
+          style: const TextStyle(fontSize: 19),
+        ),
+      );
+    } else if (snapshot.connectionState == ConnectionState.none) {
+      return const Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Text(
+            'Select an image',
+            style: TextStyle(fontSize: 19),
+          ),
+        ),
+      );
+    } else {
+      return const CircularProgressIndicator.adaptive();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    //  final counter = ref.watch(counterProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Image '),
@@ -34,35 +80,22 @@ class _ImageEngravingPageState extends State<ImageEngravingPage> {
                 );
 
                 if (result?.isNotEmpty ?? false) {
-                  _imagePreviewNotifier.value = Uint8List.fromList(
-                    await io.File(result!).readAsBytes(),
+                  await Future.delayed(
+                    const Duration(milliseconds: 750),
                   );
+                  ref
+                      .read(editableImageProvider.notifier)
+                      .setImageFromFile(io.File(result!));
                 }
               },
-              child: ValueListenableBuilder<Uint8List?>(
-                valueListenable: _imagePreviewNotifier,
-                builder: (context, value, child) {
-                  return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 360),
-                    switchInCurve: Curves.easeInOut,
-                    switchOutCurve: Curves.easeInOut,
-                    child: value == null
-                        ? child
-                        : Padding(
-                            key: UniqueKey(),
-                            padding: const EdgeInsets.all(10),
-                            child: Image.memory(value),
-                          ),
-                  );
-                },
-                child: const Center(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Text(
-                      'Select an image',
-                      style: TextStyle(fontSize: 19),
-                    ),
-                  ),
+              child: FutureBuilder<Uint8List>(
+                initialData: null,
+                future: ref.watch(editableImageProvider).imagePreviewBytes,
+                builder: (context, snapshot) => AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 360),
+                  switchInCurve: Curves.easeInOut,
+                  switchOutCurve: Curves.easeInOut,
+                  child: _imagePreviewBuilder(context, snapshot),
                 ),
               ),
             ),
@@ -71,7 +104,7 @@ class _ImageEngravingPageState extends State<ImageEngravingPage> {
             child: Container(
               constraints: const BoxConstraints.expand(),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.secondary,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
@@ -84,7 +117,43 @@ class _ImageEngravingPageState extends State<ImageEngravingPage> {
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [],
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(editableImageProvider.notifier)
+                          .applyRidgeFilter();
+                    },
+                    child: const Text('Ridge Detection'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(editableImageProvider.notifier)
+                          .applyEdgeFilter();
+                    },
+                    child: const Text('Edge Detection'),
+                  ),
+                  if (ref.read(editableImageProvider).imagePreview != null)
+                    ElevatedButton(
+                      onPressed: () async {
+                        final image = await reshapeToSquare(
+                          await fitImageToSize(
+                            await ref.read(editableImageProvider).imagePreview!,
+                            const Size.square(32),
+                          ),
+                        );
+                        navKey.currentState!.push(
+                          MaterialPageRoute(
+                            builder: (context) => EngravingPage(
+                              image: image,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text('Engrave Image'),
+                    ),
+                ],
               ),
             ),
           ),
