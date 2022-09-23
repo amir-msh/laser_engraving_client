@@ -19,6 +19,8 @@ dependencies:
   flutter_riverpod: ^1.0.4
   dough: ^1.0.3
   equatable: ^2.0.5
+  intl: ^0.17.0
+  wakelock: ^0.6.2
 
 
 dev_dependencies:
@@ -32,6 +34,7 @@ flutter:
   assets:
     - assets/launcher_icons/foreground-windows.png
     - assets/rive/
+    - assets/patterns/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

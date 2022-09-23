@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:laser_engraving_client/components/option_card.dart';
 import 'package:laser_engraving_client/pages/image_engraving.dart';
 import 'package:laser_engraving_client/pages/painting_engraving.dart';
+import 'package:laser_engraving_client/pages/pattern_engraving.dart';
 import 'package:rive/rive.dart';
 
 class HomePage extends StatefulWidget {
@@ -80,7 +81,13 @@ class _HomePageState extends State<HomePage> {
                 OptionCard(
                   icon: const Icon(Icons.pattern),
                   title: 'Ready Patterns',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PatternEngravingPage(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

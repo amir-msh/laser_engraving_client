@@ -8,7 +8,6 @@ import 'package:image/image.dart' as img;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:laser_engraving_client/image_processing/image_processing.dart';
-import 'package:laser_engraving_client/utils/functions.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ImageConversionTestPage extends StatefulWidget {

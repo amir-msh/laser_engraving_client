@@ -30,7 +30,7 @@ class BluetoothComSendingDataState extends BluetoothComState {
     required this.progress,
   });
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [progress];
 }
 
 class BluetoothComErrorState extends BluetoothComState {

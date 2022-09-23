@@ -5,6 +5,7 @@ import 'package:laser_engraving_client/components/drawing_painter.dart';
 import 'package:laser_engraving_client/image_processing/functions.dart';
 import 'package:laser_engraving_client/main.dart';
 import 'package:laser_engraving_client/pages/engraving.dart';
+import 'package:laser_engraving_client/utils/constants.dart';
 
 class PaintingEngravingPage extends StatefulWidget {
   const PaintingEngravingPage({Key? key}) : super(key: key);
@@ -30,19 +31,17 @@ class _PaintingEngravingPageState extends State<PaintingEngravingPage> {
     final image = await boundary.toImage(pixelRatio: 2.0);
     final byteData = await image.toByteData();
 
-    return img.invert(
-      await reshapeToSquare(
-        await fitImageToSize(
-          img.copyResize(
-            img.Image.fromBytes(
-              image.width,
-              image.height,
-              byteData!.buffer.asUint8List().toList(),
-            ),
-            width: 512,
+    return await reshapeToSquare(
+      await fitImageToSize(
+        img.copyResize(
+          img.Image.fromBytes(
+            image.width,
+            image.height,
+            byteData!.buffer.asUint8List().toList(),
           ),
-          const Size.square(64),
+          width: 512,
         ),
+        Size.square(defaultImageWidth.toDouble()),
       ),
     );
   }
@@ -83,33 +82,32 @@ class _PaintingEngravingPageState extends State<PaintingEngravingPage> {
         ],
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AspectRatio(
             aspectRatio: 1,
-            child: Container(
-              constraints: const BoxConstraints.expand(),
-              child: GestureDetector(
-                onPanStart: (details) => onDrawing(details.localPosition),
-                onPanDown: (details) {
-                  _paintingNotifier.addNewSession(
-                    _strokeWidthNotifier.value,
-                  );
-                  onDrawing(details.localPosition);
-                },
-                onPanUpdate: (details) => onDrawing(details.localPosition),
-                child: RepaintBoundary(
-                  key: _canvasKey,
-                  child: ValueListenableBuilder<PaintingData>(
-                    valueListenable: _paintingNotifier,
-                    builder: (context, data, child) {
-                      return CustomPaint(
-                        painter: DrawingPainter(
-                          sessions: data.paintingSessions,
-                          invert: data.invert,
-                        ),
-                      );
-                    },
-                  ),
+            child: GestureDetector(
+              onPanStart: (details) => onDrawing(details.localPosition),
+              onPanDown: (details) {
+                _paintingNotifier.addNewSession(
+                  _strokeWidthNotifier.value,
+                );
+                onDrawing(details.localPosition);
+              },
+              onPanUpdate: (details) => onDrawing(details.localPosition),
+              child: RepaintBoundary(
+                key: _canvasKey,
+                child: ValueListenableBuilder<PaintingData>(
+                  valueListenable: _paintingNotifier,
+                  builder: (context, data, child) {
+                    return CustomPaint(
+                      painter: DrawingPainter(
+                        sessions: data.paintingSessions,
+                        invert: data.invert,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

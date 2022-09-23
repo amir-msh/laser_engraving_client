@@ -13,7 +13,8 @@ class BluetoothHelper {
     Permission.locationWhenInUse,
   ];
 
-  BluetoothHelper() { FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
+  BluetoothHelper() {
+    FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
     FlutterBluetoothSerial.instance.state;
   }
 
@@ -63,35 +64,45 @@ class BluetoothHelper {
     final deviceCompleter = Completer<BluetoothDevice?>();
 
     await FlutterBluetoothSerial.instance.cancelDiscovery();
-    await Future.delayed(const Duration(milliseconds: 500));
 
     FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
     if (devicePassword != null) {
       FlutterBluetoothSerial.instance.setPairingRequestHandler(
         (request) {
-          if (request.address == deviceAddress) {
-            return Future.value(devicePassword);
-          }
-          return Future.value(null);
+          return Future.value(devicePassword);
+          // if (request.address == deviceAddress) {}
+          // return Future.value(null);
         },
       );
     }
 
-    FlutterBluetoothSerial.instance.startDiscovery().listen(
-      (res) {
-        log('${res.device.name}:${res.device.address} FOUND!');
-        if (res.device.address == deviceAddress) {
-          FlutterBluetoothSerial.instance.cancelDiscovery().then(
-                (value) => deviceCompleter.complete(res.device),
-              );
-        }
-      },
-      onError: (e, s) {
-        deviceCompleter.complete(null);
-        log('Flutter bluetooth listening error', error: e);
-      },
-      onDone: () async {},
+    final bondedDevices =
+        await FlutterBluetoothSerial.instance.getBondedDevices();
+
+    bondedDevices.removeWhere(
+      (device) => device.address != deviceAddress,
     );
+    // && device.isConnected,
+
+    if (bondedDevices.isNotEmpty) {
+      deviceCompleter.complete(bondedDevices.last);
+    } else {
+      FlutterBluetoothSerial.instance.startDiscovery().listen(
+        (res) {
+          log('${res.device.name}:${res.device.address} FOUND!');
+          if (res.device.address == deviceAddress) {
+            FlutterBluetoothSerial.instance.cancelDiscovery().then(
+                  (value) => deviceCompleter.complete(res.device),
+                );
+          }
+        },
+        onError: (e, s) {
+          deviceCompleter.complete(null);
+          log('Flutter bluetooth listening error', error: e);
+        },
+        onDone: () async {},
+      );
+    }
 
     final device = await deviceCompleter.future.timeout(
       const Duration(seconds: 20),
@@ -99,6 +110,7 @@ class BluetoothHelper {
 
     if (device != null) {
       FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
+
       return BluetoothHelperConnection(
         await BluetoothConnection.toAddress(deviceAddress),
       );

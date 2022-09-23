@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laser_engraving_client/image_processing/functions.dart';
 import 'package:laser_engraving_client/riverpod/editable_image/editable_image_state.dart';
 import 'package:image/image.dart' as img;
+import 'package:laser_engraving_client/utils/constants.dart';
 
 final editableImageProvider = StateNotifierProvider.autoDispose<
     EditableImageNotifier, EditableImageState>(
@@ -14,7 +15,7 @@ final editableImageProvider = StateNotifierProvider.autoDispose<
 
 class EditableImageNotifier extends StateNotifier<EditableImageState> {
   EditableImageNotifier() : super(EditableImageState());
-  static const int difaultImageWidth = 256;
+  static const int difaultImageWidth = defaultImageWidth;
 
   Future<img.Image> _edgeFilter(
     img.Image image, [
@@ -54,6 +55,23 @@ class EditableImageNotifier extends StateNotifier<EditableImageState> {
 
     state = EditableImageState(
       imageSource: imageSource,
+      imagePreview: editedImage,
+      imagePreviewBytes: editedImageBytes,
+    );
+  }
+
+  Future<void> applyReversionFilter() async {
+    final editedImage = Future<img.Image>(
+      () async => img.invert(await state.imagePreview!),
+    );
+    final editedImageBytes = Future<Uint8List>(
+      () async => Uint8List.fromList(
+        img.encodePng(await editedImage),
+      ),
+    );
+
+    state = EditableImageState(
+      imageSource: state.imageSource,
       imagePreview: editedImage,
       imagePreviewBytes: editedImageBytes,
     );

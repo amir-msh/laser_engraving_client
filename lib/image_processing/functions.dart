@@ -39,6 +39,36 @@ Future<Uint8List> convertToViewableBytes(img.Image image) async {
   return Uint8List.fromList(img.encodeBmp(image));
 }
 
+int setBitInByte(int byte, int bitIndex, bool value) {
+  if (value) return byte | (1 << bitIndex);
+  return byte & (~(1 << bitIndex));
+}
+
+bool isWhite(int color) => (color | 0xff000000) == 0xffffffff;
+bool isBlack(int color) => (color | 0xff000000) == 0xff000000;
+
+Future<Uint8List> imageToBlackAndWhiteBytes(img.Image image) async {
+  final imgWidth = image.width;
+  final imgPixels = imgWidth * imgWidth;
+  final imageBytes = Uint8List(imgPixels ~/ 8);
+  int bitIndex = 0;
+
+  for (int y = 0; y < imgWidth; y++) {
+    for (int x = 0; x < imgWidth; x++) {
+      if (isBlack(image.getPixel(x, y))) {
+        imageBytes[bitIndex ~/ 8] = setBitInByte(
+          imageBytes[bitIndex ~/ 8],
+          7 - (bitIndex % 8),
+          true,
+        );
+      }
+      bitIndex++;
+    }
+  }
+
+  return imageBytes;
+}
+
 /// [luminanceThreshold] should be a value between 0.0 and 1.0
 Future<img.Image> maskUsingLuminance(
   final img.Image image, [

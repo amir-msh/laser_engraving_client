@@ -6,9 +6,9 @@ import 'dart:typed_data';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laser_engraving_client/bluetooth_helper/bluetooth_helper.dart';
+import 'package:laser_engraving_client/image_processing/functions.dart';
 import 'package:laser_engraving_client/riverpod/bluetooth/bluetooth_state.dart';
 import 'package:image/image.dart' as img;
-import 'package:laser_engraving_client/utils/functions.dart';
 
 final bluetoothComProvider =
     StateNotifierProvider<BluetoothComNotifier, BluetoothComState>(
@@ -20,6 +20,7 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
   BluetoothHelperConnection? _btConnection;
   static const btAddress = '00:18:E5:03:7D:0E';
   static const btPassword = '1234';
+  static const maxPacketSize = 512;
   final btHelper = BluetoothHelper();
 
   BluetoothComNotifier() : super(BluetoothComInitialState()) {
@@ -43,15 +44,26 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
 
   Future<void> initialize() async {
     if (!await requestPermissions()) return;
+    await Future.doWhile(
+      () async {
+        try {
+          state = BluetoothComDiscoveryState();
+          _btConnection = await btHelper.connectTo(btAddress, btPassword);
+          state = BluetoothComConnectedState();
+          return false;
+        } catch (e) {
+          state = BluetoothComErrorState('Bluetooth was unable to connect!');
+          await Future.delayed(const Duration(milliseconds: 2500));
+          return true;
+        }
+      },
+    );
+  }
 
-    try {
-      state = BluetoothComDiscoveryState();
-      _btConnection = await btHelper.connectTo(btAddress);
-
-      state = BluetoothComConnectedState();
-    } catch (e) {
-      state = BluetoothComErrorState(e.toString());
-    }
+  Future<void> disconnect() async {
+    await _btConnection?.finish();
+    await _btConnection?.close();
+    _btConnection = null;
   }
 
   Future<void> sendImage(img.Image image) async {
@@ -60,27 +72,12 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
 
     final imgWidth = image.width;
     final imgPixels = imgWidth * imgWidth;
-    final btPacketSize = imgPixels ~/ 8;
-    //imgPixels ~/ 8;
-    final bleBytes = Uint8List(imgPixels ~/ 8);
+    final btPacketSize = math.min(imgPixels ~/ 8, maxPacketSize);
 
     log('Image Res : $imgWidth * $imgWidth');
     log('Converting image to valid bytes ...');
 
-    int bitIndex = 0;
-
-    for (int y = 0; y < imgWidth; y++) {
-      for (int x = 0; x < imgWidth; x++) {
-        if (image.getPixel(x, y) != 0xff000000) {
-          bleBytes[bitIndex ~/ 8] = setBitInByte(
-            bleBytes[bitIndex ~/ 8],
-            7 - (bitIndex % 8),
-            true,
-          );
-        }
-        bitIndex++;
-      }
-    }
+    final bleBytes = await imageToBlackAndWhiteBytes(image);
     log('Image convertion finished');
 
     log('Sending request');
@@ -92,11 +89,12 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
     );
     log('request sent');
 
-    final packetsLength = imgPixels ~/ btPacketSize;
-    log(bleBytes.length.toString());
+    final packetsLength = (imgPixels ~/ 8) ~/ btPacketSize;
+    log('bleBytes.length : ${bleBytes.length.toString()}');
     // state = const BluetoothComSendingDataState(progress: 0);
 
     for (int pktNum = 0; pktNum < packetsLength; pktNum++) {
+      log('For loop (bt notifier) round $pktNum of $packetsLength ');
       final done = await waitForString(
         _btConnection!.input,
         waitFor: '#done\r',
@@ -104,7 +102,7 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
       );
       await Future.delayed(const Duration(milliseconds: 750));
       state = BluetoothComSendingDataState(
-        progress: pktNum / math.max(1, packetsLength - 1),
+        progress: (pktNum + 1) / packetsLength,
       );
       if (done) {
         log('response received (success)');
@@ -144,6 +142,7 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
     required String waitFor,
     Duration? timeout = const Duration(seconds: 10),
   }) async {
+    log('Waiting', name: 'waitForString()');
     assert(cnStream.isBroadcast, "Please pass a broadcast stream");
 
     const terminatorChar = '\n';
@@ -159,7 +158,10 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
 
     final subs = cnStream.listen(
       (data) {
-        final str = utf8.decode(data);
+        final str = utf8.decode(
+          data,
+          allowMalformed: true,
+        );
         final endIndex = str.indexOf(terminatorChar);
         if (endIndex >= 0) {
           buffer.write(str.substring(0, endIndex));

@@ -7,6 +7,7 @@ import 'package:laser_engraving_client/image_processing/functions.dart';
 import 'package:laser_engraving_client/main.dart';
 import 'package:laser_engraving_client/pages/engraving.dart';
 import 'package:laser_engraving_client/riverpod/editable_image/editable_image_notifier.dart';
+import 'package:laser_engraving_client/utils/constants.dart';
 
 class ImageEngravingPage extends ConsumerStatefulWidget {
   const ImageEngravingPage({Key? key}) : super(key: key);
@@ -103,8 +104,9 @@ class ImageEngravingPageState extends ConsumerState<ImageEngravingPage> {
           Expanded(
             child: Container(
               constraints: const BoxConstraints.expand(),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
@@ -118,41 +120,99 @@ class ImageEngravingPageState extends ConsumerState<ImageEngravingPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(editableImageProvider.notifier)
-                          .applyRidgeFilter();
-                    },
-                    child: const Text('Ridge Detection'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(editableImageProvider.notifier)
-                          .applyEdgeFilter();
-                    },
-                    child: const Text('Edge Detection'),
-                  ),
-                  if (ref.read(editableImageProvider).imagePreview != null)
-                    ElevatedButton(
-                      onPressed: () async {
-                        final image = await reshapeToSquare(
-                          await fitImageToSize(
-                            await ref.read(editableImageProvider).imagePreview!,
-                            const Size.square(32),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
+                      child: DefaultTextStyle(
+                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                        child: ElevatedButtonTheme(
+                          data: ElevatedButtonThemeData(
+                            style: Theme.of(context)
+                                .elevatedButtonTheme
+                                .style!
+                                .copyWith(
+                                  minimumSize: MaterialStatePropertyAll<Size>(
+                                    const Size(200, 45),
+                                  ),
+                                ),
                           ),
-                        );
-                        navKey.currentState!.push(
-                          MaterialPageRoute(
-                            builder: (context) => EngravingPage(
-                              image: image,
+                          child: Center(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(editableImageProvider.notifier)
+                                          .applyRidgeFilter();
+                                    },
+                                    child: const Text('Ridge Detection'),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(editableImageProvider.notifier)
+                                          .applyEdgeFilter();
+                                    },
+                                    child: const Text('Edge Detection'),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(editableImageProvider.notifier)
+                                          .applyReversionFilter();
+                                    },
+                                    child: const Text('Revert'),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        );
-                      },
-                      child: const Text('Engrave Image'),
+                        ),
+                      ),
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: SizedBox(
+                      height: 55,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          textStyle: const TextStyle(fontSize: 17.5),
+                        ),
+                        onPressed: ref
+                                    .read(editableImageProvider)
+                                    .imagePreview ==
+                                null
+                            ? null
+                            : () async {
+                                final image = await reshapeToSquare(
+                                  await fitImageToSize(
+                                    await ref
+                                        .read(editableImageProvider)
+                                        .imagePreview!,
+                                    Size.square(defaultImageWidth.toDouble()),
+                                  ),
+                                );
+                                navKey.currentState!.push(
+                                  MaterialPageRoute(
+                                    builder: (context) => EngravingPage(
+                                      image: image,
+                                    ),
+                                  ),
+                                );
+                              },
+                        child: const Text('Engrave Image'),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
