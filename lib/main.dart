@@ -38,8 +38,8 @@ class _AppState extends State<App> {
         perspectiveWarpDepth: 0.012,
         usePerspectiveWarp: true,
         gyroPrefs: GyroDoughPrefs(
-          sampleCount: 5,
-          gyroMultiplier: 17.5,
+          sampleCount: 25,
+          gyroMultiplier: 15,
         ),
       ),
       child: ProviderScope(

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io' as io;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -61,10 +62,11 @@ class EditableImageNotifier extends StateNotifier<EditableImageState> {
   }
 
   Future<void> applyReversionFilter() async {
-    final editedImage = Future<img.Image>(
+    final editedImage = Future<img.Image>.sync(
       () async => img.invert(await state.imagePreview!),
     );
-    final editedImageBytes = Future<Uint8List>(
+
+    final editedImageBytes = Future<Uint8List>.sync(
       () async => Uint8List.fromList(
         img.encodePng(await editedImage),
       ),

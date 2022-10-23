@@ -277,7 +277,7 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
                     valueListenable: _timerNotifier,
                     builder: (context, value, child) {
                       return LabeledDuration(
-                        label: 'Time Spent : ',
+                        label: 'Elapsed Time : ',
                         duration: _timerNotifier.value,
                       );
                     },

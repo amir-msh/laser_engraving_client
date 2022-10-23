@@ -19,7 +19,7 @@ class _PatternEngravingPageState extends State<PatternEngravingPage> {
         addAutomaticKeepAlives: true,
         addRepaintBoundaries: true,
         padding: const EdgeInsets.all(8.0),
-        itemCount: 5,
+        itemCount: 15,
         itemBuilder: (context, index) {
           return PatternCard(
             imageAssetPath: 'assets/patterns/$index.png',

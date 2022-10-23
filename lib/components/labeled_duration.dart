@@ -16,13 +16,12 @@ class LabeledDuration extends StatelessWidget {
         super(key: key);
 
   static String durationToReadable(Duration duration) {
-    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     final minutes = duration.inMinutes.toString().padLeft(2, '0');
     String hours = '';
     if (duration.inHours > 0) {
       hours = ":${duration.inHours.toString().padLeft(2, '0')}";
     }
-
     return '$hours$minutes:$seconds';
   }
 

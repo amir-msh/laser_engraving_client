@@ -156,29 +156,13 @@ Future<img.Image> convertToEdgeDetected(
   img.Image image, [
   final double luminanceThreshold = 0.07,
 ]) async {
-  // image = await fitImageToSize(image, const Size.square(1000));
-
   img.grayscale(image);
   img.vignette(image, start: 0.5, end: 0.9);
   img.contrast(image, 120);
   img.gaussianBlur(image, 1);
   img.sobel(image, amount: 1);
   await maskUsingLuminance(image, luminanceThreshold);
-  // image = img.copyCrop(image, 1, 1, image.width - 2, image.height - 2);
 
-  // if (invert) {
-  //   img.invert(image);
-  //   image = await reshapeToSquare(
-  //     image,
-  //     backgroundColor: 0xFFFFFFFF,
-  //   );
-  // } else {
-  //   image = await reshapeToSquare(
-  //     image,
-  //     backgroundColor: 0xFF000000,
-  //   );
-  // }
-  // image = img.copyResize(image, width: 300, height: 300);
   return image;
 }
 

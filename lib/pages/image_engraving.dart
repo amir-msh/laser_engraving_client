@@ -145,29 +145,47 @@ class ImageEngravingPageState extends ConsumerState<ImageEngravingPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   ElevatedButton(
-                                    onPressed: () {
-                                      ref
-                                          .read(editableImageProvider.notifier)
-                                          .applyRidgeFilter();
-                                    },
+                                    onPressed: ref
+                                                .read(editableImageProvider)
+                                                .imagePreview ==
+                                            null
+                                        ? null
+                                        : () {
+                                            ref
+                                                .read(editableImageProvider
+                                                    .notifier)
+                                                .applyRidgeFilter();
+                                          },
                                     child: const Text('Ridge Detection'),
                                   ),
                                   const SizedBox(height: 6),
                                   ElevatedButton(
-                                    onPressed: () {
-                                      ref
-                                          .read(editableImageProvider.notifier)
-                                          .applyEdgeFilter();
-                                    },
+                                    onPressed: ref
+                                                .read(editableImageProvider)
+                                                .imagePreview ==
+                                            null
+                                        ? null
+                                        : () {
+                                            ref
+                                                .read(editableImageProvider
+                                                    .notifier)
+                                                .applyEdgeFilter();
+                                          },
                                     child: const Text('Edge Detection'),
                                   ),
                                   const SizedBox(height: 6),
                                   ElevatedButton(
-                                    onPressed: () {
-                                      ref
-                                          .read(editableImageProvider.notifier)
-                                          .applyReversionFilter();
-                                    },
+                                    onPressed: ref
+                                                .read(editableImageProvider)
+                                                .imagePreview ==
+                                            null
+                                        ? null
+                                        : () {
+                                            ref
+                                                .read(editableImageProvider
+                                                    .notifier)
+                                                .applyReversionFilter();
+                                          },
                                     child: const Text('Revert'),
                                   ),
                                 ],

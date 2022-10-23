@@ -11,8 +11,6 @@ class BluetoothConnectionStateViewer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(bluetoothComProvider);
 
-    // final state = BluetoothComRequestingPermissionState() as BluetoothComState;
-
     late final Widget icon;
 
     if (state is BluetoothComRequestingPermissionState) {
@@ -47,11 +45,15 @@ class BluetoothConnectionStateViewer extends ConsumerWidget {
         );
       } else {
         icon = Transform.scale(
-          key: const Key('BluetoothComSendingDataState()'),
+          key: Key('BluetoothComSendingDataState(progress:${state.progress})'),
           scale: 0.75,
           child: CircularProgressIndicator.adaptive(
             value: state.progress,
             valueColor: const AlwaysStoppedAnimation(Colors.white),
+            backgroundColor:
+                Theme.of(context).colorScheme.secondary.withOpacity(
+                      0.2,
+                    ),
           ),
         );
       }
@@ -72,8 +74,8 @@ class BluetoothConnectionStateViewer extends ConsumerWidget {
     }
 
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 900),
-      reverseDuration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 960),
+      reverseDuration: const Duration(milliseconds: 960),
       switchInCurve: Curves.easeInOut,
       switchOutCurve: Curves.easeInOut,
       transitionBuilder: (child, animation) {
