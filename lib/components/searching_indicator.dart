@@ -23,7 +23,7 @@ class SearchingIndicatorState extends State<SearchingIndicator>
       TweenSequenceItem<Offset>(
         tween: Tween<Offset>(
           begin: Offset.zero,
-          end: Offset(3, 3),
+          end: const Offset(3, 3),
         ).chain(
           CurveTween(
             curve: Curves.easeIn,
@@ -33,28 +33,28 @@ class SearchingIndicatorState extends State<SearchingIndicator>
       ),
       TweenSequenceItem<Offset>(
         tween: Tween<Offset>(
-          begin: Offset(3, 3),
-          end: Offset(3, -3),
+          begin: const Offset(3, 3),
+          end: const Offset(3, -3),
         ),
         weight: 1,
       ),
       TweenSequenceItem<Offset>(
         tween: Tween<Offset>(
-          begin: Offset(3, -3),
-          end: Offset(-3, -3),
+          begin: const Offset(3, -3),
+          end: const Offset(-3, -3),
         ),
         weight: 1,
       ),
       TweenSequenceItem<Offset>(
         tween: Tween<Offset>(
-          begin: Offset(-3, -3),
-          end: Offset(-3, 3),
+          begin: const Offset(-3, -3),
+          end: const Offset(-3, 3),
         ),
         weight: 1,
       ),
       TweenSequenceItem<Offset>(
         tween: Tween<Offset>(
-          begin: Offset(-3, 3),
+          begin: const Offset(-3, 3),
           end: Offset.zero,
         ).chain(
           CurveTween(
@@ -180,7 +180,7 @@ class SearchingIndicatorState extends State<SearchingIndicator>
           child: child,
         );
       },
-      child: Icon(Icons.search),
+      child: const Icon(Icons.search),
     );
   }
 }

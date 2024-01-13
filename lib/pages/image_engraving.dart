@@ -124,7 +124,7 @@ class ImageEngravingPageState extends ConsumerState<ImageEngravingPage> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
                       child: DefaultTextStyle(
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -134,8 +134,9 @@ class ImageEngravingPageState extends ConsumerState<ImageEngravingPage> {
                                 .elevatedButtonTheme
                                 .style!
                                 .copyWith(
-                                  minimumSize: MaterialStatePropertyAll<Size>(
-                                    const Size(200, 45),
+                                  minimumSize:
+                                      const MaterialStatePropertyAll<Size>(
+                                    Size(200, 45),
                                   ),
                                 ),
                           ),

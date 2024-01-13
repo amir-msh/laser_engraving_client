@@ -47,21 +47,21 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
 
   Widget stateViewerBuilder(BluetoothComState state) {
     if (state is BluetoothComDiscoveryState) {
-      return CircularProgressIndicator.adaptive();
+      return const CircularProgressIndicator.adaptive();
     } else if (state is BluetoothComErrorState) {
       return Icon(
         Icons.error,
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.error,
       );
     } else if (state is BluetoothComDiscoveryState) {
-      return CircularProgressIndicator.adaptive();
+      return const CircularProgressIndicator.adaptive();
     } else if (state is BluetoothComSendingDataState) {
       return Icon(
         Icons.send_to_mobile_sharp,
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.error,
       );
     } else {
-      return CircularProgressIndicator.adaptive();
+      return const CircularProgressIndicator.adaptive();
     }
   }
 
@@ -88,13 +88,13 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text('No'),
+                  child: const Text('No'),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
-                  child: Text('Yes'),
+                  child: const Text('Yes'),
                 ),
               ],
             );
@@ -150,13 +150,19 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.read(bluetoothComProvider.notifier);
-    return WillPopScope(
-      onWillPop: () async {
-        final result = await _showAlertDialog();
-        if (result) {
-          await state.disconnect();
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool isPopped) async {
+        if (isPopped) return;
+
+        final isCancelled = await _showAlertDialog();
+
+        if (!isCancelled) return;
+
+        await state.disconnect();
+        if (mounted) {
+          Navigator.of(context).pop();
         }
-        return result;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -184,7 +190,7 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
             ),
             Expanded(
               child: DefaultTextStyle(
-                style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -204,7 +210,7 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
                         border: Border.all(
                           color: Theme.of(context).colorScheme.primary,
                           width: imageBorderWidth,
-                          strokeAlign: StrokeAlign.outside,
+                          strokeAlign: BorderSide.strokeAlignOutside,
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -231,7 +237,7 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
                               errorBuilder: (context, error, stackTrace) {
                                 return Icon(
                                   Icons.error,
-                                  color: Theme.of(context).errorColor,
+                                  color: Theme.of(context).colorScheme.error,
                                 );
                               },
                               frameBuilder: (
@@ -265,7 +271,7 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
             ),
             const SizedBox(height: 25),
             ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 230),
+              constraints: const BoxConstraints(maxWidth: 230),
               child: Column(
                 children: [
                   LabeledDuration(
@@ -299,7 +305,7 @@ class _EngravingPageState extends ConsumerState<EngravingPage> {
                   navKey.currentState!.pop();
                 }
               },
-              child: Text('Stop'),
+              child: const Text('Stop'),
             ),
             const SizedBox(height: 30),
           ],

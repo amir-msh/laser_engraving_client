@@ -30,7 +30,7 @@ class PatternCard extends StatelessWidget {
               aspectRatio: 1,
               child: Container(
                 clipBehavior: Clip.none,
-                constraints: BoxConstraints.expand(),
+                constraints: const BoxConstraints.expand(),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(
@@ -100,7 +100,7 @@ class PatternCard extends StatelessWidget {
                   //   bytes,
                   // );
                 },
-                child: Text('Engrave it!'),
+                child: const Text('Engrave it!'),
               ),
             ),
           ],

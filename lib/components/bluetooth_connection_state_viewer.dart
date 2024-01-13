@@ -23,7 +23,7 @@ class BluetoothConnectionStateViewer extends ConsumerWidget {
         child: Icon(
           Icons.perm_scan_wifi_outlined,
           key: const Key('BluetoothComRequestingPermissionState()'),
-          color: Theme.of(context).errorColor,
+          color: Theme.of(context).colorScheme.error,
         ),
       );
     } else if (state is BluetoothComDiscoveryState) {
@@ -61,11 +61,11 @@ class BluetoothConnectionStateViewer extends ConsumerWidget {
       icon = Icon(
         Icons.error_outline,
         key: const Key('BluetoothComErrorState()'),
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.error,
       );
     } else {
       icon = Transform.scale(
-        key: Key('Other states'),
+        key: const Key('Other states'),
         scale: 0.75,
         child: const CircularProgressIndicator.adaptive(
           valueColor: AlwaysStoppedAnimation(Colors.white),

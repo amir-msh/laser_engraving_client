@@ -17,7 +17,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
     return SafeArea(
       child: Container(
         constraints: const BoxConstraints.expand(),
-        color: Theme.of(context).backgroundColor,
+        color: Theme.of(context).colorScheme.background,
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(10),

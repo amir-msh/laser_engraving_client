@@ -13,7 +13,7 @@ class _PatternEngravingPageState extends State<PatternEngravingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Patterns'),
+        title: const Text('Patterns'),
       ),
       body: ListView.builder(
         addAutomaticKeepAlives: true,

@@ -52,7 +52,8 @@ class BluetoothComNotifier extends StateNotifier<BluetoothComState> {
           state = BluetoothComConnectedState();
           return false;
         } catch (e) {
-          state = BluetoothComErrorState('Bluetooth was unable to connect!');
+          state =
+              const BluetoothComErrorState('Bluetooth was unable to connect!');
           await Future.delayed(const Duration(milliseconds: 2500));
           return true;
         }

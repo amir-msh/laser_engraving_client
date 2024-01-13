@@ -51,10 +51,23 @@ class _AppState extends State<App> {
               accentColor,
             ),
             shadowColor: secondaryColor.withOpacity(0.5),
+
+            appBarTheme: const AppBarTheme(
+              backgroundColor: primaryColor,
+              titleTextStyle: TextStyle(
+                fontSize: 22,
+                color: Colors.white,
+              ),
+              iconTheme: IconThemeData(
+                color: Colors.white,
+                size: 27,
+              ),
+            ),
+
             // primaryColor: const Color(0xff112537),
             // colorSchemeSeed: const Color(0xffF37410),
 
-            backgroundColor: Colors.white,
+            scaffoldBackgroundColor: Colors.white,
             colorScheme: ColorScheme.fromSeed(
               brightness: Brightness.light,
               background: Colors.white,
@@ -65,11 +78,11 @@ class _AppState extends State<App> {
               outline: secondaryColor,
             ),
             textTheme: const TextTheme(
-              bodyText1: TextStyle(
+              bodySmall: TextStyle(
                 fontSize: 17.5,
                 color: secondaryColor,
               ),
-              bodyText2: TextStyle(
+              labelSmall: TextStyle(
                 fontSize: 17.5,
                 color: secondaryColor,
               ),
@@ -87,7 +100,10 @@ class _AppState extends State<App> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                textStyle: TextStyle(fontSize: 17),
+                textStyle: const TextStyle(
+                  fontSize: 17.5,
+                  color: Colors.white,
+                ),
               ),
             ),
             textButtonTheme: TextButtonThemeData(

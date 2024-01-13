@@ -46,7 +46,7 @@ class OptionCard extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 title,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),

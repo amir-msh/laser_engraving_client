@@ -129,7 +129,7 @@ class _PaintingEngravingPageState extends State<PaintingEngravingPage> {
                 ],
               ),
               child: DefaultTextStyle(
-                style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -190,14 +190,15 @@ class _PaintingEngravingPageState extends State<PaintingEngravingPage> {
                                     onPressed: () {
                                       _paintingNotifier.invert = false;
                                     },
-                                    icon: Icon(Icons.brightness_1),
+                                    icon: const Icon(Icons.brightness_1),
                                   ),
                                   const SizedBox(width: 10),
                                   IconButton(
                                     onPressed: () {
                                       _paintingNotifier.invert = true;
                                     },
-                                    icon: Icon(Icons.brightness_1_outlined),
+                                    icon:
+                                        const Icon(Icons.brightness_1_outlined),
                                   ),
                                 ],
                               ),
@@ -212,9 +213,6 @@ class _PaintingEngravingPageState extends State<PaintingEngravingPage> {
                         height: 55,
                         width: double.infinity,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            textStyle: const TextStyle(fontSize: 17.5),
-                          ),
                           onPressed: () async {
                             final image = await _canvasToImage();
                             navKey.currentState!.push(

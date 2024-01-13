@@ -32,7 +32,7 @@ class LabeledDuration extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyText1,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         const Spacer(),
         Text(
